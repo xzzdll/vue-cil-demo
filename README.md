@@ -23,7 +23,7 @@ For more information, please refer to [Wepack Start](https://webpack.js.org/) in
 npm install
 
 # serve with hot reload at localhost:8088
-npm start
+npm run dev
 
 # build for production with minification
 npm run build
