@@ -8,7 +8,6 @@ module.exports = merge(common, {
   devServer: {
     contentBase: path.join(__dirname, "src"),
     hot: true,
-    // publicPath: "/",
     historyApiFallback: true,
     proxy: {
       '/api': {

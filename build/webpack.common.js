@@ -1,7 +1,7 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const CleanWebpackPlugin = require('clean-webpack-plugin');
 const VueLoaderPlugin = require('vue-loader/lib/plugin')
+const CopyPlugin = require('copy-webpack-plugin');
 const webpack = require('webpack');
 function resolve(dir) {
   return path.join(__dirname, '..', dir);
@@ -16,8 +16,9 @@ module.exports = {
     }
   },
   optimization: {
-    sideEffects: true,
-    runtimeChunk: true,
+    runtimeChunk: {
+      name: 'manifest'
+    },
     splitChunks: {
       chunks: "all",
       minSize: 30000,
@@ -44,27 +45,24 @@ module.exports = {
         }
       }
     }
-    // minimize: true,
+  },
+  entry: ['babel-polyfill', './src/index.js'],
+  output: {
+    filename: '[name].[contenthash].js',
+    chunkFilename: '[name].[contenthash].js',
+    path: resolve('dist'),
+    publicPath: "/"
   },
   performance: {
     hints: false
   },
-  entry: ['babel-polyfill', './src/index.js'],
-  output: {
-    filename: 'bundle.js',
-    chunkFilename: '[name].bundle.js',
-    path: resolve('dist'),
-    publicPath: "/"
-  },
   module: {
     rules: [
       {
-        //解析vue后缀文件
         test: /\.vue$/,
         loader: 'vue-loader'
       },
       {
-        // 使用babel-loader加载js
         test: /\.js$/,
         exclude: file => (
           /node_modules/.test(file) &&
@@ -73,12 +71,10 @@ module.exports = {
         loader: "babel-loader"
       },
       {
-        //html加载
         test: /\.html$/,
         loader: 'html-loader'
       },
       {
-        //css加载
         test: /\.css$/,
         use: [
           'style-loader',
@@ -87,7 +83,6 @@ module.exports = {
         ]
       },
       {
-        //图片加载
         test: /\.(png|svg|jpg|gif)$/,
         loader: 'url-loader',
         options: {
@@ -96,7 +91,6 @@ module.exports = {
         }
       },
       {
-        // 字体加载
         test: /\.(woff|woff2|eot|ttf|otf)$/,
         loader: 'url-loader',
         options: {
@@ -115,13 +109,13 @@ module.exports = {
     ]
   },
   plugins: [
-    new CleanWebpackPlugin(),
     new HtmlWebpackPlugin({
-      template: `./public/index.html`
+      template: `./index.html`
     }),
-    new VueLoaderPlugin()
-    // new config.optimization.splitChunks({
-    //   name: 'common' // 指定公共 bundle 的名称。
-    // })
+    new VueLoaderPlugin(),
+    new webpack.HashedModuleIdsPlugin(),
+    new CopyPlugin([
+      { from: 'public', to: './' },
+    ]),
   ]
 };
